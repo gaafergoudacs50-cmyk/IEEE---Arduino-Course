@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arduino Lecture: Foundational Concepts</title>
+<style>
+:root{
+  --bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#1e293b;--shadow:#cbd5e1;
+  --blue:#2563eb;--orange:#b45309;--red:#dc2626;--green:#047857;--code-bg:#0f172a;--code-ink:#e2e8f0;--chip:#fef3c7;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1220;--card:#111a2e;--ink:#e6edf7;--muted:#9fb0c6;--line:#64748b;--shadow:#1e293b;
+    --blue:#7aa7ff;--orange:#f0b05a;--red:#ff8a8a;--green:#4fd1a5;--code-bg:#050a14;--code-ink:#e2e8f0;--chip:#3b2f12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1220;--card:#111a2e;--ink:#e6edf7;--muted:#9fb0c6;--line:#64748b;--shadow:#1e293b;
+  --blue:#7aa7ff;--orange:#f0b05a;--red:#ff8a8a;--green:#4fd1a5;--code-bg:#050a14;--code-ink:#e2e8f0;--chip:#3b2f12;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;
+  background-image:linear-gradient(var(--shadow) 1px,transparent 1px),linear-gradient(90deg,var(--shadow) 1px,transparent 1px);background-size:40px 40px;background-attachment:fixed}
+.wrap{max-width:900px;margin:0 auto;padding:40px 20px 64px}
+header{margin-bottom:28px}
+.eyebrow{color:var(--blue);font-weight:700;letter-spacing:.12em;font-size:.85rem}
+h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.1;margin:.2em 0 .3em;font-weight:800}
+.lead{color:var(--muted);font-size:1.1rem;margin:0}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+nav a{color:var(--ink);text-decoration:none;border:2px solid var(--line);border-radius:8px;padding:6px 12px;background:var(--card);font-weight:600;font-size:.9rem}
+nav a:hover{background:var(--chip)}
+section{background:var(--card);border:2px solid var(--line);border-radius:10px;box-shadow:6px 6px 0 var(--shadow);padding:24px 26px;margin:28px 0}
+h2{margin:0 0 .5em;font-size:1.5rem}
+h2 span{display:inline-block;margin-right:.35em}
+.s1 h2{color:var(--blue)}.s2 h2{color:var(--orange)}.s3 h2{color:var(--green)}.s4 h2{color:var(--red)}
+ul{padding-left:1.2em;margin:.6em 0}
+li{margin:.55em 0}
+code{font-family:"Courier New",ui-monospace,monospace;color:var(--red);font-weight:700;font-size:.95em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+.mini{border:2px solid var(--line);border-radius:8px;padding:14px 16px;background:var(--bg)}
+.mini h3{margin:0 0 .3em;font-size:1.05rem}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+@media(max-width:600px){.compare{grid-template-columns:1fr}}
+.chipbox{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.chip{background:var(--chip);padding:6px 12px;font-weight:600;border-radius:4px}
+.calc{border:2px dashed var(--line);border-radius:8px;padding:16px;margin:16px 0}
+.calc h3{margin:0 0 10px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);font-weight:600;gap:4px}
+input{font:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.result{margin-top:14px;font-size:1.2rem;font-weight:800}
+.warn{color:var(--red);font-size:.95rem;font-weight:600}
+pre{background:var(--code-bg);color:var(--code-ink);padding:18px 20px;border-radius:8px;overflow-x:auto;font-family:"Courier New",ui-monospace,monospace;font-size:1rem;line-height:1.5;margin:14px 0}
+.cm{color:#93c5fd}
+.note{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;color:var(--green);font-size:1.05rem}
+footer{color:var(--muted);text-align:center;font-size:.9rem;margin-top:32px}
+.page{display:none}.page.on{display:block}
+a.card{display:block;color:inherit;text-decoration:none}a.card:hover{background:var(--chip)}
+#nav a.on{background:var(--chip)}
+#pager a{color:var(--ink);font-weight:700;text-decoration:none;border:2px solid var(--line);border-radius:8px;padding:8px 14px;background:var(--card)}
+ol{padding-left:1.2em;margin:.4em 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">ARDUINO COURSE · LECTURE 1</div>
+  <h1>Foundational Concepts</h1>
+  <p class="lead">Four modules: system architecture, microcontroller hardware, circuit prototyping, and software integration.</p>
+  <nav id="nav"><a href="#home">Home</a><a href="#architecture">1 · Architecture</a><a href="#hardware">2 · Hardware</a><a href="#prototyping">3 · Prototyping</a><a href="#software">4 · Software</a><a href="#assignments">Assignments</a><a href="#tasks">Tasks</a><a href="#projects">Projects</a></nav>
+</header>
+
+<section class="page" data-page="home">
+  <h2 style="color:var(--blue)">Start here</h2>
+  <p>Pick a page. Each module covers one part of the lecture, and the assignments put it all into practice.</p>
+  <div class="grid">
+    <a class="mini card" href="#architecture"><h3>1 · Architecture</h3><p>Embedded systems, µP vs µC, and IC packages.</p></a>
+    <a class="mini card" href="#hardware"><h3>2 · Arduino Hardware</h3><p>The Uno board, power pins, digital and analog pins.</p></a>
+    <a class="mini card" href="#prototyping"><h3>3 · Prototyping</h3><p>LEDs, resistors, breadboards, jumper wires, plus a calculator.</p></a>
+    <a class="mini card" href="#software"><h3>4 · Software</h3><p>The Arduino IDE, code structure and the blinking LED task.</p></a>
+    <a class="mini card" href="#assignments"><h3>Assignments</h3><p>Two LED sequence challenges to try yourself.</p></a>
+  
+</section>
+
+<section class="s1 page" data-page="architecture">
+  <h2><span>1.</span>Core Architecture of Embedded Systems</h2>
+  <p>An embedded system combines specific hardware with dedicated software to perform a targeted function, operating entirely within a larger mechanical or electrical system. Common commercial examples include the digital control boards inside air conditioners or the touchscreen interfaces on smart refrigerators.</p>
+  <h3>Microprocessors (µP) vs. Microcontrollers (µC)</h3>
+  <div class="compare">
+    <div class="mini"><h3>Microprocessor (µP)</h3><p>Acts solely as the CPU, requiring external, separate chips for memory and I/O ports.</p></div>
+    <div class="mini"><h3>Microcontroller (µC)</h3><p>Integrates the CPU, memory, and I/O ports into a single Integrated Circuit (IC) chip.</p></div>
+  </div>
+  <p>ICs come in different packaging types, such as <b>Through Hole Devices (THD)</b> and <b>Surface Mount Devices (SMD)</b>.</p>
+</section>
+
+<section class="s2 page" data-page="hardware">
+  <h2><span>2.</span>The Arduino Hardware Platform</h2>
+  <p>Arduino is an open-source hardware and software platform functioning as a micro-computer on a board, utilizing a programming language derived from C++. The standard Arduino Uno board features several critical physical components and pin categories:</p>
+  <div class="grid">
+    <div class="mini"><h3>Power Delivery</h3><p>The board includes a USB jack, a barrel jack, and a built-in voltage regulator. The <code>Vin</code> pin supplies voltage to the board (optimally 7-12V) or acts as a voltage output, while the <code>5V</code> and <code>3.3V</code> pins output those exact regulated voltages. The <code>GND</code> pins serve as the common 0V ground.</p></div>
+    <div class="mini"><h3>Digital I/O (Pins 0-13)</h3><p>These 14 pins can be programmed as either inputs or outputs. Pin 13 is internally wired to a built-in LED on the board itself.</p></div>
+    <div class="mini"><h3>Analog Inputs (Pins A0-A5)</h3><p>These 6 pins are primarily used to read analog input signals, though they can also read digital inputs. If configured as outputs, they can only produce digital signals.</p></div>
+  </div>
+</section>
+
+<section class="s3 page" data-page="prototyping">
+  <h2><span>3.</span>Prototyping Hardware and Circuitry</h2>
+  <p>Building embedded projects requires standardizing the physical connections between the microcontroller and external electronic components.</p>
+  <ul>
+    <li><b>LEDs (Light Emitting Diodes):</b> These are polarized components with a positive leg (anode) and a negative leg (cathode).</li>
+    <li><b>Resistors:</b> Used to limit current, resistor values are calculated using Ohm’s Law (V = IR). For example, if powering an LED that drops 2V from a 5V Arduino pin, the resistor must drop the remaining 3V. Limiting the current to a safe 15mA (below the 20mA maximum) requires a 200 Ω resistor (R = 3V / 15mA). Resistor values are identified using standardized color-coded bands detailing digits, multipliers, and tolerance.</li>
+    <li><b>Breadboards:</b> These solderless boards contain hidden metal clips. The outer power rails run horizontally along the entire length of the board, while the inner component rows are connected vertically in short blocks of five holes. This layout allows components to be easily wired in series (one after another) or parallel.</li>
+    <li><b>Jumper Wires:</b> Connections are made using Male-Male, Male-Female, or Female-Female jumper cables depending on the component headers.</li>
+  </ul>
+  <div class="calc">
+    <h3>Try it: resistor calculator</h3>
+    <div class="fields">
+      <label>Supply voltage (V)<input id="vs" type="number" step="0.1" value="5" min="0"></label>
+      <label>LED voltage drop (V)<input id="vl" type="number" step="0.1" value="2" min="0"></label>
+      <label>Current (mA)<input id="ia" type="number" step="1" value="15" min="1"></label>
+    </div>
+    <div class="result" id="out"></div>
+    <div class="warn" id="warn"></div>
+  </div>
+</section>
+
+<section class="s4 page" data-page="software">
+  <h2><span>4.</span>Software Integration and Execution</h2>
+  <p>The software side is handled by the Arduino IDE, an environment containing all necessary instructions to command the hardware.</p>
+  <ul>
+    <li><b>IDE Setup:</b> The interface includes a text editor for the code, a message area for compilation feedback, and toolbars for common commands. Before uploading, the user must navigate to the <code>Tools</code> menu to select the correct Board (e.g., Arduino Uno) and the active Port (e.g., COM3).</li>
+    <li><b>Code Structure:</b> Every Arduino script requires a <code>setup()</code> function that runs a single time to initialize settings, followed by a <code>loop()</code> function that executes continuously.</li>
+    <li><b>The Blinking LED Task:</b> To program an LED to blink indefinitely at one-second intervals, the <code>setup()</code> function uses <code>pinMode(13, OUTPUT)</code> to initialize pin 13. The <code>loop()</code> function then uses <code>digitalWrite(13, HIGH)</code> to turn the LED on, <code>delay(1000)</code> to pause for one second (1000 milliseconds), <code>digitalWrite(13, LOW)</code> to turn it off, and another <code>delay(1000)</code> before the cycle repeats.</li>
+  </ul>
+<pre>void setup() {
+  pinMode(13, OUTPUT);      <span class="cm">// initialize pin 13</span>
+}
+
+void loop() {
+  digitalWrite(13, HIGH);   <span class="cm">// LED on</span>
+  delay(1000);              <span class="cm">// wait 1 second</span>
+  digitalWrite(13, LOW);    <span class="cm">// LED off</span>
+  delay(1000);              <span class="cm">// wait 1 second</span>
+}</pre>
+  <p class="note">setup() runs once, loop() repeats forever.</p>
+</section>
+
+<section class="page s4" data-page="assignments">
+  <h2>Assignments</h2>
+  <p>Connect the LEDs wherever you like. Initially they are all off, and each sequence repeats forever.</p>
+  <div class="compare">
+    <div class="mini"><h3 style="color:var(--blue)">3 LEDs (X, Y, Z)</h3><ol><li>Turn on LED X, wait 0.1 second.</li><li>Turn on LED Y, wait 0.1 second.</li><li>Turn on LED Z, wait 0.1 second.</li><li>Turn them all off.</li><li>Repeat forever.</li></ol></div>
+    <div class="mini"><h3 style="color:var(--red)">5 LEDs (A, B, C, D, E)</h3><ol><li>Turn on LEDs A and E, wait 0.08 second.</li><li>Turn on LEDs B and D, wait 0.08 second.</li><li>Turn on LED C, wait 0.08 second.</li><li>Turn them all off.</li><li>Repeat forever.</li></ol></div>
+  </div>
+  <p class="note">Hint: start from the blinking LED sketch and add one pin per LED.</p>
+</section>
+<div id="pager" style="display:flex;justify-content:space-between;gap:12px"></div>
+<section class="page" data-page="dyn" id="dyn"></section>
+<footer>Arduino Course · Lecture 1 notes</footer>
+</div>
+<script>
+(function(){
+var P=[],LV=['Beginner','Intermediate','Advanced'];
+function pins(n){var a=[];for(var i=0;i<n;i++)a.push(i+2);return a}
+function hd(n,body,extra){return '// '+n+' LEDs on pins 2-'+(n+1)+'\nconst int N = '+n+';\nconst int FIRST = 2;\n'+(extra||'')+'\nvoid setup() {\n  for (int i = 0; i < N; i++) pinMode(FIRST + i, OUTPUT);\n}\n\nvoid loop() {\n'+body+'\n}'}
+function T(t,lv,parts,goal,code,ch){var o={k:'t',t:t,lv:lv,parts:parts,goal:goal,code:code,ch:ch};P.push(o);return o}
+function L(n){return 'Arduino Uno, breadboard, '+n+' LEDs, '+n+' × 220 Ω resistors, jumper wires'}
+var i,n;
+for(n=2;n<=9;n++)T('Chaser: '+n+' LEDs',n<5?0:1,L(n),'Light the '+n+' LEDs one after another, then repeat.',hd(n,'  for (int i = 0; i < N; i++) {\n    digitalWrite(FIRST + i, HIGH);\n    delay(100);\n    digitalWrite(FIRST + i, LOW);\n  }'),'Make the chase run right to left.');
+for(n=3;n<=9;n++)T('Bounce: '+n+' LEDs',n<6?1:2,L(n),'Move one lit LED to the end and back again.',hd(n,'  for (int i = 0; i < N - 1; i++) step(i);\n  for (int i = N - 1; i > 0; i--) step(i);','\nvoid step(int i) {\n  digitalWrite(FIRST + i, HIGH);\n  delay(80);\n  digitalWrite(FIRST + i, LOW);\n}\n'),'Add a speed that changes with each pass.');
+for(n=2;n<=8;n++)T('Binary Counter: '+n+' bits',n<5?1:2,L(n),'Show the numbers 0 to '+((1<<n)-1)+' in binary on the LEDs.',hd(n,'  for (int v = 0; v < (1 << N); v++) {\n    for (int b = 0; b < N; b++)\n      digitalWrite(FIRST + b, (v >> b) & 1);\n    delay(400);\n  }'),'Count down instead of up.');
+[2000,1000,500,250,100,50,20].forEach(function(d){T('Blink Every '+d+' ms',d>=250?0:1,'Arduino Uno, 1 LED, 1 × 220 Ω resistor, jumper wires','Blink the LED on pin 13 with '+d+' ms on and '+d+' ms off.','void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay('+d+');\n  digitalWrite(13, LOW);\n  delay('+d+');\n}',d<=50?'Can you still see the blinking? Why does it look steady?':'Change the off time only.')});
+[[100,900],[200,800],[500,500],[800,200],[900,100],[50,950]].forEach(function(p){T('Duty Pattern: '+p[0]+'/'+p[1]+' ms',0,'Arduino Uno, 1 LED, 1 × 220 Ω resistor','Keep the LED on for '+p[0]+' ms and off for '+p[1]+' ms.','void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay('+p[0]+');\n  digitalWrite(13, LOW);\n  delay('+p[1]+');\n}','Which pattern looks like a heartbeat?')});
+[1,3,5,10,15].forEach(function(s){T('PWM Fade, step '+s,1,'Arduino Uno, 1 LED on pin 9 (PWM), 1 × 220 Ω resistor','Fade the LED in and out using steps of '+s+'.','void setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  for (int b = 0; b <= 255; b += '+s+') { analogWrite(9, b); delay(10); }\n  for (int b = 255; b >= 0; b -= '+s+') { analogWrite(9, b); delay(10); }\n}','Compare how smooth each step size looks.')});
+for(n=3;n<=8;n++)T('Random LED: '+n+' LEDs',1,L(n),'Light a random LED from '+n+' every half second.',hd(n,'  int r = random(N);\n  digitalWrite(FIRST + r, HIGH);\n  delay(500);\n  digitalWrite(FIRST + r, LOW);','\n'),'Never pick the same LED twice in a row.').code=hd(n,'  int r = random(N);\n  digitalWrite(FIRST + r, HIGH);\n  delay(500);\n  digitalWrite(FIRST + r, LOW);').replace('pinMode(FIRST + i, OUTPUT);\n}','pinMode(FIRST + i, OUTPUT);\n  randomSeed(analogRead(A0));\n}');
+for(n=4;n<=9;n++)T('Odd and Even: '+n+' LEDs',0,L(n),'Alternate between the even-numbered and odd-numbered LEDs.',hd(n,'  for (int i = 0; i < N; i++) digitalWrite(FIRST + i, i % 2);\n  delay(300);\n  for (int i = 0; i < N; i++) digitalWrite(FIRST + i, !(i % 2));\n  delay(300);'),'Make three groups instead of two.');
+for(n=1;n<=8;n++)T('Blink '+n+' Time'+(n>1?'s':'')+' and Pause',0,'Arduino Uno, 1 LED on pin 13','Blink '+n+' time'+(n>1?'s':'')+', then rest for two seconds.','void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  for (int k = 0; k < '+n+'; k++) {\n    digitalWrite(13, HIGH); delay(200);\n    digitalWrite(13, LOW);  delay(200);\n  }\n  delay(2000);\n}','Use a variable instead of '+n+'.');
+[10,25,50,75,100].forEach(function(v){T('Brightness '+v+'%',0,'Arduino Uno, 1 LED on pin 9 (PWM), 1 × 220 Ω resistor','Hold the LED at '+v+'% brightness.','void setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  analogWrite(9, '+Math.round(v*2.55)+');\n}','Why is 50% not half as bright to your eye?')});
+for(n=3;n<=9;n++)T('Blink on Pin '+n,0,'Arduino Uno, 1 LED, 1 × 220 Ω resistor','Move the LED to pin '+n+' and blink it once per second.','void setup() {\n  pinMode('+n+', OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite('+n+', HIGH);\n  delay(1000);\n  digitalWrite('+n+', LOW);\n  delay(1000);\n}','Change only the pin number in the code and the wiring.');
+function J(t,lv,parts,goal,code,ch){P.push({k:'p',t:t,lv:lv,parts:parts,goal:goal,code:code.split('~').join('\n'),ch:ch})}
+var UL='Arduino Uno, breadboard, jumper wires, ';
+J('Traffic Light',0,UL+'red, yellow and green LEDs, 3 × 220 Ω','Run a red, green, yellow cycle on pins 8, 9 and 10.','void setup() { for (int p = 8; p <= 10; p++) pinMode(p, OUTPUT); }~void loop() {~  digitalWrite(8, HIGH); delay(4000); digitalWrite(8, LOW);~  digitalWrite(10, HIGH); delay(3000); digitalWrite(10, LOW);~  digitalWrite(9, HIGH); delay(1000); digitalWrite(9, LOW);~}','Add a short red + yellow warning step.');
+J('Button Controls LED',0,UL+'push button, LED, 220 Ω','Light the LED while the button is held.','void setup() { pinMode(2, INPUT_PULLUP); pinMode(13, OUTPUT); }~void loop() { digitalWrite(13, digitalRead(2) == LOW); }','Invert the behavior.');
+J('Toggle Switch Button',1,UL+'push button, LED, 220 Ω','Each press flips the LED on or off.','bool on = false;~void setup() { pinMode(2, INPUT_PULLUP); pinMode(13, OUTPUT); }~void loop() {~  if (digitalRead(2) == LOW) { on = !on; digitalWrite(13, on); delay(250); }~}','Replace delay() with proper debouncing.');
+J('Pedestrian Crossing',1,UL+'5 LEDs, push button, resistors','A button requests a walk signal after the cars stop.','void setup() { for (int p = 8; p <= 12; p++) pinMode(p, OUTPUT); pinMode(2, INPUT_PULLUP); }~void loop() {~  digitalWrite(10, HIGH); digitalWrite(12, HIGH); // green car, red walk~  if (digitalRead(2) == LOW) {~    digitalWrite(10, LOW); digitalWrite(8, HIGH); delay(1000);~    digitalWrite(12, LOW); digitalWrite(11, HIGH); delay(5000);~    digitalWrite(11, LOW); digitalWrite(8, LOW);~  }~}','Add a flashing walk warning.');
+J('Potentiometer Dimmer',0,UL+'10k potentiometer, LED on pin 9, 220 Ω','Control LED brightness with the knob.','void setup() { pinMode(9, OUTPUT); }~void loop() { analogWrite(9, analogRead(A0) / 4); }','Print the value to the Serial Monitor.');
+J('Automatic Night Light',1,UL+'LDR, 10k resistor, LED on pin 9','Turn on the LED when the room gets dark.','void setup() { pinMode(9, OUTPUT); }~void loop() { digitalWrite(9, analogRead(A0) < 400); delay(100); }','Fade the light in smoothly.');
+J('Buzzer Alarm',0,UL+'piezo buzzer on pin 8','Play a 1 kHz tone, then silence, repeatedly.','void setup() {}~void loop() { tone(8, 1000); delay(500); noTone(8); delay(500); }','Make the pitch rise each time.');
+J('Doorbell',1,UL+'push button, buzzer','Play a two-note chime when pressed.','void setup() { pinMode(2, INPUT_PULLUP); }~void loop() {~  if (digitalRead(2) == LOW) { tone(8, 660, 300); delay(350); tone(8, 523, 500); delay(600); }~}','Add a third note.');
+J('Temperature Display',1,UL+'TMP36 sensor','Print the temperature in °C to the Serial Monitor.','void setup() { Serial.begin(9600); }~void loop() {~  float c = (analogRead(A0) * 5.0 / 1024 - 0.5) * 100;~  Serial.println(c); delay(500);~}','Show °F too.');
+J('Ultrasonic Distance Meter',1,UL+'HC-SR04 sensor','Measure distance in centimetres.','void setup() { Serial.begin(9600); pinMode(9, OUTPUT); pinMode(10, INPUT); }~void loop() {~  digitalWrite(9, HIGH); delayMicroseconds(10); digitalWrite(9, LOW);~  Serial.println(pulseIn(10, HIGH) * 0.034 / 2); delay(300);~}','Light an LED under 10 cm.');
+J('Parking Sensor',2,UL+'HC-SR04, buzzer','Beep faster as an object gets closer.','void setup() { pinMode(9, OUTPUT); pinMode(10, INPUT); }~void loop() {~  digitalWrite(9, HIGH); delayMicroseconds(10); digitalWrite(9, LOW);~  float d = pulseIn(10, HIGH) * 0.034 / 2;~  tone(8, 1000, 50); delay(constrain(d * 10, 50, 1000));~}','Add a steady tone under 5 cm.');
+J('Servo Sweep',0,UL+'servo on pin 9','Sweep the servo from 0 to 180 degrees.','#include <Servo.h>~Servo s;~void setup() { s.attach(9); }~void loop() {~  for (int a = 0; a <= 180; a++) { s.write(a); delay(10); }~  for (int a = 180; a >= 0; a--) { s.write(a); delay(10); }~}','Stop at 90 degrees for a second.');
+J('Servo Knob Control',1,UL+'servo, potentiometer','Point the servo with the knob.','#include <Servo.h>~Servo s;~void setup() { s.attach(9); }~void loop() { s.write(map(analogRead(A0), 0, 1023, 0, 180)); delay(15); }','Add a second servo that mirrors the first.');
+J('Reaction Timer',2,UL+'LED, button','Measure how fast you press after the LED lights.','void setup() { Serial.begin(9600); pinMode(13, OUTPUT); pinMode(2, INPUT_PULLUP); }~void loop() {~  delay(random(2000, 5000)); digitalWrite(13, HIGH);~  unsigned long t = millis();~  while (digitalRead(2) == HIGH);~  Serial.println(millis() - t); digitalWrite(13, LOW);~}','Detect early presses as cheating.');
+J('Electronic Dice',1,UL+'push button','Press to roll a number from 1 to 6.','void setup() { Serial.begin(9600); pinMode(2, INPUT_PULLUP); randomSeed(analogRead(A0)); }~void loop() {~  if (digitalRead(2) == LOW) { Serial.println(random(1, 7)); delay(300); }~}','Show the result on 6 LEDs.');
+J('Fire Alarm',1,UL+'TMP36, buzzer, LED','Sound an alarm above 40 °C.','void setup() { pinMode(8, OUTPUT); pinMode(13, OUTPUT); }~void loop() {~  float c = (analogRead(A0) * 5.0 / 1024 - 0.5) * 100;~  if (c > 40) { tone(8, 2000); digitalWrite(13, HIGH); } else { noTone(8); digitalWrite(13, LOW); }~}','Add a second warning level.');
+J('Plant Moisture Monitor',0,UL+'soil moisture sensor, LED','Light the LED when the soil is dry.','void setup() { pinMode(13, OUTPUT); }~void loop() { digitalWrite(13, analogRead(A0) > 600); delay(500); }','Calibrate the threshold in water and in dry soil.');
+J('Motion Detector',0,UL+'PIR sensor, LED, buzzer','Signal when movement is detected.','void setup() { pinMode(2, INPUT); pinMode(13, OUTPUT); pinMode(8, OUTPUT); }~void loop() { bool m = digitalRead(2); digitalWrite(13, m); if (m) tone(8, 800, 200); delay(100); }','Add an arm/disarm button.');
+J('Line Detector',1,UL+'IR line sensor, LED','Light the LED on a dark line.','void setup() { pinMode(2, INPUT); pinMode(13, OUTPUT); }~void loop() { digitalWrite(13, digitalRead(2) == LOW); }','Use two sensors to find the edge.');
+J('Obstacle Warning',1,UL+'IR obstacle sensor, 2 LEDs','Show green when clear and red when blocked.','void setup() { pinMode(2, INPUT); pinMode(12, OUTPUT); pinMode(13, OUTPUT); }~void loop() { bool b = digitalRead(2) == LOW; digitalWrite(12, b); digitalWrite(13, !b); }','Add a buzzer.');
+J('RGB Color Cycle',1,UL+'RGB LED, 3 × 220 Ω','Fade through red, green and blue.','void setup() { for (int p = 9; p <= 11; p++) pinMode(p, OUTPUT); }~void loop() {~  for (int c = 0; c < 3; c++)~    for (int b = 0; b <= 255; b++) { analogWrite(9 + c, b); delay(5); analogWrite(9 + c, 0); }~}','Blend two colors at once.');
+J('Mood Lamp',2,UL+'RGB LED, 3 pots','Mix your own color with three knobs.','void setup() { for (int p = 9; p <= 11; p++) pinMode(p, OUTPUT); }~void loop() { for (int c = 0; c < 3; c++) analogWrite(9 + c, analogRead(A0 + c) / 4); }','Store favorite colors with a button.');
+J('LED Level Meter',1,UL+'potentiometer, 5 LEDs','Light more LEDs as the knob turns up.','void setup() { for (int p = 2; p <= 6; p++) pinMode(p, OUTPUT); }~void loop() {~  int lvl = analogRead(A0) / 205;~  for (int i = 0; i < 5; i++) digitalWrite(2 + i, i < lvl);~}','Flash the top LED at maximum.');
+J('SOS Signal',0,UL+'LED','Flash the Morse code for SOS.','void blink(int t) { digitalWrite(13, HIGH); delay(t); digitalWrite(13, LOW); delay(200); }~void setup() { pinMode(13, OUTPUT); }~void loop() {~  for (int i = 0; i < 3; i++) blink(200);~  for (int i = 0; i < 3; i++) blink(600);~  for (int i = 0; i < 3; i++) blink(200);~  delay(2000);~}','Add a buzzer.');
+J('Heartbeat LED',1,UL+'LED on pin 9','Two quick pulses, then a rest.','void pulse() { for (int b = 0; b < 255; b += 5) { analogWrite(9, b); delay(2); } for (int b = 255; b >= 0; b -= 5) { analogWrite(9, b); delay(4); } }~void setup() { pinMode(9, OUTPUT); }~void loop() { pulse(); pulse(); delay(700); }','Let a knob change the heart rate.');
+J('Metronome',1,UL+'buzzer, LED, potentiometer','Set the tempo from 40 to 200 BPM.','void setup() { pinMode(13, OUTPUT); }~void loop() {~  int bpm = map(analogRead(A0), 0, 1023, 40, 200);~  digitalWrite(13, HIGH); tone(8, 1000, 40); delay(60); digitalWrite(13, LOW);~  delay(60000 / bpm - 60);~}','Accent every fourth beat.');
+J('Three-Button Piano',1,UL+'3 buttons, buzzer','Play three different notes.','int pin[] = {2, 3, 4}; int note[] = {262, 330, 392};~void setup() { for (int i = 0; i < 3; i++) pinMode(pin[i], INPUT_PULLUP); }~void loop() {~  noTone(8);~  for (int i = 0; i < 3; i++) if (digitalRead(pin[i]) == LOW) tone(8, note[i]);~}','Add a fourth key.');
+J('Stopwatch',2,UL+'2 buttons','Start and stop with one button, reset with the other.','unsigned long t0; bool run = false;~void setup() { Serial.begin(9600); pinMode(2, INPUT_PULLUP); pinMode(3, INPUT_PULLUP); }~void loop() {~  if (!digitalRead(2)) { run = !run; if (run) t0 = millis(); delay(250); }~  if (run) Serial.println((millis() - t0) / 1000.0);~  delay(100);~}','Keep the elapsed time on stop.');
+J('Secret Code Lock',2,UL+'3 buttons, green and red LEDs','Open only when buttons are pressed in the correct order.','int code[] = {2, 4, 3}; int i = 0;~void setup() { for (int p = 2; p <= 4; p++) pinMode(p, INPUT_PULLUP); pinMode(12, OUTPUT); pinMode(13, OUTPUT); }~void loop() {~  for (int p = 2; p <= 4; p++) if (!digitalRead(p)) {~    if (p == code[i]) i++; else i = 0;~    if (i == 3) { digitalWrite(12, HIGH); delay(2000); digitalWrite(12, LOW); i = 0; }~    delay(300);~  }~}','Flash red after a wrong press.');
+J('Flame Alert Robot Sensor',2,UL+'flame sensor, buzzer, LED','The first step toward a firefighting robot.','void setup() { pinMode(8, OUTPUT); pinMode(13, OUTPUT); }~void loop() {~  bool fire = analogRead(A0) < 300;~  digitalWrite(13, fire); if (fire) tone(8, 1500); else noTone(8);~}','Aim a servo toward the flame.');
+var ids=[],tc=0,pc=0;P.forEach(function(p){p.id=p.k+(p.k=='t'?++tc:++pc)});
+var order=['home','architecture','hardware','prototyping','software','assignments','tasks','projects'].concat(P.map(function(p){return p.id}));
+var names={home:'Home',architecture:'1 · Architecture',hardware:'2 · Hardware',prototyping:'3 · Prototyping',software:'4 · Software',assignments:'Assignments',tasks:'All Tasks',projects:'All Projects'};
+P.forEach(function(p){names[p.id]=p.t});
+var done={};try{done=JSON.parse(localStorage.getItem('ard-done')||'{}')}catch(e){}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function list(k){return '<h2 style="color:var(--'+(k=='t'?'blue':'red')+')">All '+(k=='t'?'Tasks':'Projects')+'</h2><div class="grid">'+P.filter(function(p){return p.k==k}).map(function(p){return '<a class="mini card" href="#'+p.id+'"><h3>'+(done[p.id]?'✓ ':'')+esc(p.t)+'</h3><p>'+LV[p.lv]+'</p></a>'}).join('')+'</div>'}
+function view(id){
+  var p=P.filter(function(x){return x.id==id})[0];
+  return '<div class="eyebrow">'+(p.k=='t'?'TASK':'PROJECT')+' · '+LV[p.lv].toUpperCase()+'</div><h2 style="color:var(--'+(p.k=='t'?'blue':'red')+')">'+esc(p.t)+'</h2><p><b>Goal:</b> '+esc(p.goal)+'</p><p><b>You need:</b> '+esc(p.parts)+'</p><pre>'+esc(p.code)+'</pre><p class="note">Challenge: '+esc(p.ch)+'</p><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="dn" style="width:auto"'+(done[id]?' checked':'')+'> Mark as done</label>';
+}
+function show(){
+  var p=(location.hash||'').replace('#','');if(order.indexOf(p)<0)p='home';
+  var st=['home','architecture','hardware','prototyping','software','assignments'].indexOf(p)>-1,dy=document.getElementById('dyn');
+  document.querySelectorAll('.page').forEach(function(s){s.classList.toggle('on',st&&s.getAttribute('data-page')===p)});
+  dy.classList.toggle('on',!st);
+  if(!st){dy.innerHTML=p=='tasks'?list('t'):p=='projects'?list('p'):view(p);var c=document.getElementById('dn');if(c)c.onchange=function(){done[p]=c.checked;try{localStorage.setItem('ard-done',JSON.stringify(done))}catch(e){}}}
+  document.querySelectorAll('#nav a').forEach(function(a){var t=a.getAttribute('href').slice(1);a.classList.toggle('on',t===p||(t=='tasks'&&p[0]=='t'&&/\d/.test(p))||(t=='projects'&&p[0]=='p'&&/\d/.test(p)&&p!='prototyping'))});
+  var i=order.indexOf(p),pg=document.getElementById('pager');
+  pg.innerHTML=(i>0?'<a href="#'+order[i-1]+'">← '+esc(names[order[i-1]])+'</a>':'<span></span>')+(i<order.length-1?'<a href="#'+order[i+1]+'">'+esc(names[order[i+1]])+' →</a>':'<span></span>');
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',show);show();
+console.log(order.length);
+})();
+</script>
+<script>
+(function(){
+  var vs=document.getElementById('vs'),vl=document.getElementById('vl'),ia=document.getElementById('ia');
+  var out=document.getElementById('out'),warn=document.getElementById('warn');
+  function calc(){
+    var v=parseFloat(vs.value)-parseFloat(vl.value),i=parseFloat(ia.value)/1000;
+    warn.textContent='';
+    if(!(v>0)||!(i>0)){out.textContent='Enter a supply voltage above the LED drop.';return;}
+    var r=v/i;
+    out.textContent='R = '+v.toFixed(1).replace(/\.0$/,'')+'V / '+ia.value+'mA = '+Math.round(r*10)/10+' Ω';
+    if(parseFloat(ia.value)>20)warn.textContent='Above the 20mA maximum for small LEDs. Lower the current.';
+  }
+  [vs,vl,ia].forEach(function(e){e.addEventListener('input',calc)});
+  calc();
+})();
+</script>
+</body>
+</html>
